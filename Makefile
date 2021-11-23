@@ -1,8 +1,6 @@
 SHELL				=	/bin/bash
 export MKDIR_P		:=	mkdir -p
-export SVNROOT 		:=	https://cluster.earlham.edu/svn/bccd-ng/branches/skylar/bccd-3.4.0-build_ng
-export SVN_REV 		=	$(shell svn info $(SVNROOT)|awk '$$1 ~ /^Revision:/ {print $$2}')
-export SVN_CO		:=	svn cat -r
+export SVN_REV 		=	no_svn_rev
 export VERSION		:=	3.4.0
 # KERN_REV needs to be set to a version supported by aufs (see /usr/src/aufs-xxx/dkms.conf)
 export KERN_REV		:=	4.16.0-2-amd64
