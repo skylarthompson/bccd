@@ -8,7 +8,7 @@ pipeline {
             }
             post {
                 cleanup {
-                    rm -rf debootstrap
+                    sh 'rm -rf debootstrap'
                 }
             }
         }
