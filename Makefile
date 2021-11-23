@@ -49,6 +49,7 @@ target/debootstrap-bccd.tar.bz2: target/bccd.noarch.deb debootstrap
 	/bin/rm --one-file-system -rf "$(WORKSPACE)/debootstrap"
 
 target/debootstrap.tar.bz2: debootstrap
+	mkdir -p "$(WORKSPACE)"/target
 	/bin/tar -C "$(WORKSPACE)" --exclude="$<"'/proc/*' --exclude="$<"'/sys/*' -cf - "$<" | nice /usr/bin/pbzip2 -c > "$(@)"
 	/bin/rm --one-file-system -rf "$(WORKSPACE)/$<"
 
