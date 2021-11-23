@@ -1,9 +1,9 @@
 pipeline {
     agent any
     stages{
-        stage('debootstrap') {
+        stage('target/debootstrap.tar.bz2') {
             steps {
-                sh 'make debootstrap'
+                sh 'make target/debootstrap.tar.bz2'
                 archiveArtifacts artifacts: 'target/debootstrap.tar.bz2', fingerprint: true
             }
         }
