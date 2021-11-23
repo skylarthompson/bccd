@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+
+if [[ -z ${WORKSPACE} ]]; then
+    echo "Must be run w/i Jenkins!" >&2
+    exit 1
+fi
+
+. "${WORKSPACE}"/bccd.conf
+
+trap 'debootstrap_cleanup' INT TERM EXIT ERR
+
+DBS_TAR="${WORKSPACE}/target/debootstrap.tar.bz2"
+
+# Support either debootstrap-bccd or debootstrap
+if [[ -z ${NO_BCCD} ]]; then
+    DBS_BCCD_TAR="${WORKSPACE}/target/debootstrap-bccd.tar.bz2"
+else
+    DBS_BCCD_TAR="${DBS_TAR}"
+fi
+
+if [[ ! -d "${DBS_DIR}" ]]; then
+    mkdir -p "${DBS_DIR}"
+fi
+
+if [[ "${WORKSPACE}" =~ debootstrap$ ]]; then
+    sudo debootstrap \
+        --include=systemd-container \
+        --arch amd64 \
+        "${DEBIAN_RELEASE}" \
+        "${DBS_DIR}" \
+        http://debmirror.cluster.earlham.edu
+elif [[ -r "${DBS_BCCD_TAR}" ]]; then
+    nice pbzip2 -dc "${DBS_BCCD_TAR}" | tar -C "${WORKSPACE}" -xf -
+elif [[ -r "${DBS_TAR}" ]]; then
+    nice pbzip2 -dc "${DBS_TAR}" | tar -C "${WORKSPACE}" -xf -
+else
+    echo "No valid action available!" >&2
+    exit 1
+fi
+
+for dir in proc sys boot/grub; do
+    if [[ ! -d "${DBS_DIR}"/"${dir}" ]]; then
+        /bin/mkdir "${DBS_DIR}"/"${dir}"
+    fi
+done
+
+setup_virtual_mounts
+
+for service in systemd-{networkd,resolved}; do 
+    chroot "${DBS_DIR}" systemctl enable "${service}"
+done
+
+exit 0
