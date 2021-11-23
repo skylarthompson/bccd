@@ -44,7 +44,7 @@ fi
 
 for dir in proc sys boot/grub; do
     if [[ ! -d "${DBS_DIR}"/"${dir}" ]]; then
-        /bin/mkdir "${DBS_DIR}"/"${dir}"
+        /bin/mkdir -p "${DBS_DIR}"/"${dir}"
     fi
 done
 
