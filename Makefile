@@ -10,12 +10,16 @@ export KERN_REV		:=	4.16.0-2-amd64
 .PHONY: install-iso 
 
 # Archive this in Jenkins so that downstream projects have the correct ordering b/w target/bccd.noarch.deb and build/etc/bccd-revision
-build/etc/bccd-revision: 
+# GIT MIGRATION: COMMENT OUT UNTIL WE CAN GET THE GIT COMMIT ID
+#build/etc/bccd-revision: 
+#	/bin/mkdir -p "$(WORKSPACE)"/build/etc
+#	@echo "$(VERSION).$(SVN_REVISION)" > "$(WORKSPACE)"/build/etc/bccd-revision
+#	# Set modification time of bccd-revision to bccd.noarch.deb if it is available, to avoid
+#	# unnecessary rebuild of bccd.noarch.deb if it is copied in from another build
+#	find "$(WORKSPACE)"/target -type f -name bccd.noarch.deb -exec touch -r "{}" "$@" \;
+build/etc/bccd-revision:
 	/bin/mkdir -p "$(WORKSPACE)"/build/etc
-	@echo "$(VERSION).$(SVN_REVISION)" > "$(WORKSPACE)"/build/etc/bccd-revision
-	# Set modification time of bccd-revision to bccd.noarch.deb if it is available, to avoid
-	# unnecessary rebuild of bccd.noarch.deb if it is copied in from another build
-	find "$(WORKSPACE)"/target -type f -name bccd.noarch.deb -exec touch -r "{}" "$@" \;
+	@echo "$(VERSION).nonce" > "$(WORKSPACE)"/build/etc/$@
 
 target/bccd.noarch.deb: build/etc/bccd-revision 
 	cp $< "$(WORKSPACE)/src/etc"
@@ -28,7 +32,7 @@ target/bccd.noarch.deb: build/etc/bccd-revision
 		-d gnupg2 \
 		-p "$(WORKSPACE)"/target/bccd.noarch.deb \
 		-v "$(VERSION)" \
-		--iteration "$(SVN_REVISION)" \
+		--iteration nonce \
 		-x '*/.svn*' \
 		--before-install "$(WORKSPACE)/bin/deb/bccd_deb_before_install" \
 		--after-remove "$(WORKSPACE)/bin/deb/bccd_deb_after_remove" \
