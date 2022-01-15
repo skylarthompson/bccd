@@ -26,12 +26,10 @@ if [[ ! -d "${DBS_DIR}" ]]; then
     mkdir -p "${DBS_DIR}"
 fi
 
-# DEBUG
-echo "DEBUG - STAGE_NAME = ${STAGE_NAME}" >&2
-
 if [[ "${STAGE_NAME}" = "target/debootstrap.tar.bz2" ]]; then
+    # Temporarily disable GPG checking until release file signing is sorted out
     sudo debootstrap \
-        --no-check-gpg \ # Temporary until GPG is sorted out
+        --no-check-gpg \
         --include=systemd-container \
         --arch amd64 \
         "${DEBIAN_RELEASE}" \
