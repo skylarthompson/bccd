@@ -54,6 +54,9 @@ target/debootstrap-bccd.tar.bz2: target/bccd.noarch.deb debootstrap
 target/debootstrap.tar.bz2: debootstrap
 	mkdir -p "$(WORKSPACE)"/target
 	/bin/tar -C "$(WORKSPACE)" --exclude="$<"'/proc/*' --exclude="$<"'/sys/*' -cf - "$<" | nice /usr/bin/pbzip2 -c > "$(@)"
+	# Virtual filesystems might not be mounted, but try before rm runs
+	-/bin/umount "$(WORKSPACE)/debootstrap/dev"
+	-/bin/umount "$(WORKSPACE)/debootstrap/sys"
 	/bin/rm --one-file-system -rf "$(WORKSPACE)/$<"
 
 iso/live/initrd.img: debootstrap
