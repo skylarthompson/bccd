@@ -4,7 +4,7 @@ pipeline {
         stage('target/debootstrap.tar.bz2') {
             steps {
                 sh 'make target/debootstrap.tar.bz2'
-                archiveArtifacts artifacts: 'target/debootstrap.tar.bz2', fingerprint: true
+                stash includes: 'target/debootstrap.tar.bz2'
             }
             post {
                 cleanup {
