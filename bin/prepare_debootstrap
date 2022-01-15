@@ -28,6 +28,7 @@ fi
 
 if [[ "${STAGE_NAME}" = "target/debootstrap.tar.bz2" ]]; then
     sudo debootstrap \
+        --no-check-gpg \ # Temporary until GPG is sorted out
         --include=systemd-container \
         --arch amd64 \
         "${DEBIAN_RELEASE}" \
