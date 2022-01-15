@@ -8,6 +8,8 @@ pipeline {
             }
             post {
                 cleanup {
+                    sh 'umount debootstrap/dev || exit 0'
+                    sh 'umount debootstrap/sys || exit 0'
                     sh 'rm -rf debootstrap'
                 }
             }
