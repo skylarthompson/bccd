@@ -26,7 +26,7 @@ if [[ ! -d "${DBS_DIR}" ]]; then
     mkdir -p "${DBS_DIR}"
 fi
 
-if [[ "${WORKSPACE}" =~ debootstrap$ ]]; then
+if [[ "${STAGE_NAME}" = "target/debootstrap.tar.bz2" ]]; then
     sudo debootstrap \
         --include=systemd-container \
         --arch amd64 \
