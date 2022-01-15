@@ -12,5 +12,11 @@ pipeline {
                 }
             }
         }
+        stage('target/bccd.noarch.deb') {
+            steps {
+                sh 'make target/bccd.noarch.deb'
+                stash includes: 'target/bccd.noarch.deb'
+            }
+        }
     }
 }
