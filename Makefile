@@ -46,6 +46,9 @@ target/debootstrap-bccd.tar.bz2: target/bccd.noarch.deb debootstrap
 	"$(WORKSPACE)/bin/bccd_install_pkgs"
 	# Using pbzip2 takes a couple minutes but saves 50% / 2+GB of space
 	/bin/tar -C "$(WORKSPACE)" --exclude='debootstrap/proc/*' --exclude='debootstrap/sys/*' -cf - debootstrap | nice /usr/bin/pbzip2 -c > "$(@)"
+	# Virtual filesystems might not be mounted, but try before rm runs
+	-/bin/umount "$(WORKSPACE)/debootstrap/dev"
+	-/bin/umount "$(WORKSPACE)/debootstrap/sys"
 	/bin/rm --one-file-system -rf "$(WORKSPACE)/debootstrap"
 
 target/debootstrap.tar.bz2: debootstrap
