@@ -19,7 +19,7 @@ build/src/etc/bccd-revision:
 	/bin/mkdir -p "$(WORKSPACE)"/build/src/etc
 	@echo "$(VERSION).nonce" > "$(WORKSPACE)"/$@
 
-target/bccd.noarch.deb: build/etc/bccd-revision 
+target/bccd.noarch.deb: build/src/etc/bccd-revision 
 	cp $< "$(WORKSPACE)/src/etc"
 	# Dependency on gnupg2 is required by apt-key
 	fpm \
