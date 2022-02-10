@@ -15,8 +15,8 @@ export KERN_REV		:=	4.16.0-2-amd64
 #	# Set modification time of bccd-revision to bccd.noarch.deb if it is available, to avoid
 #	# unnecessary rebuild of bccd.noarch.deb if it is copied in from another build
 #	find "$(WORKSPACE)"/target -type f -name bccd.noarch.deb -exec touch -r "{}" "$@" \;
-build/etc/bccd-revision:
-	/bin/mkdir -p "$(WORKSPACE)"/build/etc
+build/src/etc/bccd-revision:
+	/bin/mkdir -p "$(WORKSPACE)"/build/src/etc
 	@echo "$(VERSION).nonce" > "$(WORKSPACE)"/$@
 
 target/bccd.noarch.deb: build/etc/bccd-revision 
