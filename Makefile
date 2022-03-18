@@ -23,7 +23,7 @@ target/bccd.noarch.deb: build/src/etc/bccd-revision
 	# Dependency on gnupg2 is required by apt-key
 	/usr/local/bin/fpm \
 		-n bccd \
-		-C "$(WORKSPACE)"/src \
+		-C "$(WORKSPACE)"/build/src \
 		-s dir \
 		-t deb \
 		-d gnupg2 \
