@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# $Id: bccd_deb_after_install 6117 2018-12-14 03:20:42Z skylar $
+
+set -eo pipefail
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+
+# Install BCCD apt keys (#979)
+for k in /etc/bccd/keys/*; do
+    apt-key add "${k}"
+done
+
+# Set root password to "letmein" (#966)
+echo 'root:letmein'|chpasswd
+
+# Add bccd user using bccd user skeleton directory (#988)
+if ! getent passwd bccd > /dev/null; then
+    useradd -k /etc/bccd-skel -m bccd
+fi
+# Set bccd-stage to LIVE if we are running in Jenkins or a live boot (aufs mount detected)
+if [[ "x${WORKSPACE}" != "x" ]] || mount|grep -q aufs > /dev/null 2>&1 ; then
+    echo LIVE > /etc/bccd-stage
+else
+    echo LIBERATED > /etc/bccd-stage
+fi
+
+# Add snmp user (#991)
+if ! getent passwd snmp > /dev/null; then
+    useradd -r snmp
+fi
+
+# Ensure consistent NIC names (#991)
+ln -s /dev/null /etc/systemd/network/99-default.link
+
+# Activate systemd networking
+for s in systemd-{networkd,resolved}.service; do
+    systemctl enable "${s}"
+    systemctl start "${s}"
+done
+
+# Activate systemd resolver service
+ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf

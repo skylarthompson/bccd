@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -eo pipefail
+
+. /etc/bccd/conflict_files.conf
+
+for conflict_file in "${CONFLICT_FILES[@]}"; do
+    /usr/bin/dpkg-divert --remove --package bccd --rename ${conflict_file}
+done
+
+# No longer need consistent NIC names (#991)
+/bin/rm -f /etc/systemd/network/99-default.link
