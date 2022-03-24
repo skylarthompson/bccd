@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# $Id: bccd_deb_before_install 6126 2019-05-19 17:23:38Z skylar $
+
+set -eo pipefail
+
+CONFLICT_FILE="/etc/bccd/conflict_files.conf"
+CONFLICT_DIR="$(/usr/bin/dirname ${CONFLICT_FILE})"
+
+declare -a START_SERVICES CONFLICT_FILES
+
+START_SERVICES+=("systemd-networkd")
+
+CONFLICT_FILES+=("/etc/X11/Xwrapper.config")
+CONFLICT_FILES+=("/etc/dhcp/dhclient.conf")
+CONFLICT_FILES+=("/etc/dhcp/dhcpd.conf")
+CONFLICT_FILES+=("/etc/hosts.deny")
+CONFLICT_FILES+=("/etc/grub.d/10_linux")
+CONFLICT_FILES+=("/etc/grub.d/05_debian_theme")
+CONFLICT_FILES+=("/etc/profile")
+CONFLICT_FILES+=("/etc/adduser.conf")
+CONFLICT_FILES+=("/etc/default/rcS")
+CONFLICT_FILES+=("/etc/default/bluetooth")
+CONFLICT_FILES+=("/etc/sudoers")
+CONFLICT_FILES+=("/etc/hosts.allow")
+CONFLICT_FILES+=("/etc/init.d/ssh")
+CONFLICT_FILES+=("/etc/default/rcS")
+CONFLICT_FILES+=("/usr/share/desktop-base/profiles/xdg-config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml")
+CONFLICT_FILES+=("/usr/share/desktop-base/profiles/xdg-config/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml")
+CONFLICT_FILES+=("/usr/share/desktop-base/debian-security.desktop")
+CONFLICT_FILES+=("/usr/share/desktop-base/debian-homepage.desktop")
+CONFLICT_FILES+=("/usr/share/desktop-base/debian-reference.desktop")
+CONFLICT_FILES+=("/usr/share/desktop-base/grub_background.sh")
+CONFLICT_FILES+=("/usr/share/desktop-base/profiles/kde-profile/share/config/plasma-desktop-appletsrc")
+CONFLICT_FILES+=("/usr/share/desktop-base/profiles/kde-profile/share/config/ksplashrc")
+CONFLICT_FILES+=("/usr/share/images/desktop-base/debian-blueish-wallpaper.svg")
+CONFLICT_FILES+=("/usr/share/images/desktop-base/login-background.svg")
+CONFLICT_FILES+=("/usr/share/images/desktop-base/debian-blueish-wallpaper-widescreen.svg")
+CONFLICT_FILES+=("/usr/share/images/desktop-base/default")
+CONFLICT_FILES+=("/usr/share/man/man1/nvidia-xconfig.1.gz")
+CONFLICT_FILES+=("/usr/share/man/man1/nvidia-smi.1.gz")
+CONFLICT_FILES+=("/usr/share/man/man1/nvidia-installer.1.gz")
+CONFLICT_FILES+=("/usr/share/man/man1/nvidia-xconfig.1.gz")
+CONFLICT_FILES+=("/usr/share/man/man1/nvidia-settings.1.gz")
+CONFLICT_FILES+=("/usr/share/man/man8/irqtune.8.gz")
+CONFLICT_FILES+=("/usr/share/man/man8/inb.8.gz")
+CONFLICT_FILES+=("/usr/share/man/man8/scanport.8.gz")
+CONFLICT_FILES+=("/usr/share/man/man8/qic02conf.8.gz")
+CONFLICT_FILES+=("/usr/share/applications/nvidia-settings.desktop")
+CONFLICT_FILES+=("/usr/bin/nvidia-xconfig")
+CONFLICT_FILES+=("/usr/bin/nvidia-settings")
+CONFLICT_FILES+=("/usr/bin/nvidia-smi")
+CONFLICT_FILES+=("/usr/share/pdnsd/pdnsd-resolvconf.conf")
+CONFLICT_FILES+=("/etc/default/snmpd")
+CONFLICT_FILES+=("/etc/default/useradd")
+CONFLICT_FILES+=("/etc/snmp/snmpd.conf")
+CONFLICT_FILES+=("/etc/NetworkManager/NetworkManager.conf")
+CONFLICT_FILES+=("/etc/network/interfaces")
+
+if [ ! -d "${CONFLICT_DIR}" ]; then
+    /bin/mkdir -p "${CONFLICT_DIR}"
+fi
+
+echo 'declare -a CONFLICT_FILES' > ${CONFLICT_FILE}
+
+for conflict_file in "${CONFLICT_FILES[@]}"; do
+    /usr/bin/dpkg-divert --add --package bccd --rename ${conflict_file}
+    echo 'CONFLICT_FILES+=("'"${conflict_file}"'")' >> ${CONFLICT_FILE}
+done
