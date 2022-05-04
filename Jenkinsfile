@@ -22,10 +22,8 @@ pipeline {
         }
         stage('target/debootstrap-bccd.tar.bz2') {
             steps {
-                steps {
-                    sh 'make target/debootstrap-bccd.tar.bz2'
-                    stash includes: 'target/debootstrap-bccd.tar.bz2', name: 'debootstrap-bccd.tar.bz2'
-                }
+                sh 'make target/debootstrap-bccd.tar.bz2'
+                stash includes: 'target/debootstrap-bccd.tar.bz2', name: 'debootstrap-bccd.tar.bz2'
             }
         }
     }
