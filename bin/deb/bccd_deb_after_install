@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# $Id: bccd_deb_after_install 6117 2018-12-14 03:20:42Z skylar $
-
 set -eo pipefail
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
