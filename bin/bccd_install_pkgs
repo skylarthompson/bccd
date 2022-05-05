@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+. "${WORKSPACE}"/bccd.conf
+# Get PACKAGES array
+. "${WORKSPACE}"/packages.conf
+
+trap 'debootstrap_cleanup' INT TERM EXIT ERR
+
+setup_virtual_mounts
+
+# gnupg2 is required for apt-key
+/usr/bin/sudo DEBIAN_FRONTEND=noninteractive /usr/sbin/chroot "${WORKSPACE}/debootstrap" apt-get \
+    -o Dpkg::Options::="--force-confnew" \
+    -y install \
+    gnupg2
+
+# Install apt packages before bccd to avoid resolv.conf systemd-resolved problems
+/usr/bin/sudo /usr/sbin/chroot "${WORKSPACE}/debootstrap" apt-get update
+/usr/bin/sudo DEBIAN_FRONTEND=noninteractive /usr/sbin/chroot "${WORKSPACE}/debootstrap" apt-get \
+    -o Dpkg::Options::="--force-confnew" \
+    -y install \
+    ${PACKAGES[@]}
+
+# Option to disable bccd deb install (#1008)
+# bccd package sets up bccd repo and must be installed before BCCD_PACKAGES list is processed
+if [[ -z ${NO_BCCD} ]]; then
+    /usr/bin/sudo WORKSPACE="${WORKSPACE}" /usr/sbin/chroot "${WORKSPACE}/debootstrap" /usr/bin/dpkg --force-confnew -i /tmp/bccd.noarch.deb
+fi
+
+# Only install BCCD packages if NO_BCCD is not set re #1008, #1009
+if [[ -z ${NO_BCCD} ]]; then
+    /usr/bin/sudo DEBIAN_FRONTEND=noninteractive /usr/sbin/chroot "${WORKSPACE}/debootstrap" apt-get \
+        -o Dpkg::Options::="--force-confnew" \
+        -y install \
+        ${BCCD_PACKAGES[@]}
+fi
+
+# Installing grub w/ linux-image triggers errors if /dev is not mounted, but is not necessary until liberation
+/usr/bin/sudo DEBIAN_FRONTEND=noninteractive /usr/sbin/chroot "${WORKSPACE}/debootstrap" apt-get \
+    -o Dpkg::Options::="--force-confnew" \
+    -y install \
+    grub-legacy
+
+# Clean up and regenerate SSH keys (#993)
+echo "Removing SSH keys in ${WORKSPACE}/debootstrap/etc/ssh" >&2
+/usr/bin/sudo /usr/sbin/chroot "${WORKSPACE}/debootstrap" /usr/bin/find /etc/ssh -type f -name 'ssh*host*key*' -delete -print
+
+# Clean up apt cache (#998)
+echo "Cleaning apt cache" >&2
+/usr/bin/sudo /usr/sbin/chroot "${WORKSPACE}/debootstrap" /usr/bin/apt-get clean
+
+# Remove /usr/sbin/policy-rc.d so services start on boot (#924, #1008)
+/usr/sbin/chroot "${WORKSPACE}"/debootstrap rm -f /usr/sbin/policy-rc.d
