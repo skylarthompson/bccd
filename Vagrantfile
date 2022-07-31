@@ -57,7 +57,6 @@ Vagrant.configure("2") do |config|
 
   config.vm.provider "libvirt" do |lv|
     lv.memory = "2048"
-    lv.name = "bccd_build"
   end
 
   # Enable provisioning with a shell script. Additional provisioners such as
