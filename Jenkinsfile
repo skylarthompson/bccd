@@ -9,7 +9,7 @@ pipeline {
             }
             post {
                 cleanup {
-                    sh 'vagrant destroy'
+                    sh 'vagrant halt'
                 }
             }
         }
@@ -18,6 +18,11 @@ pipeline {
                 sh 'vagrant up'
                 sh 'echo make -C /vagrant target/bccd.noarch.deb|vagrant ssh'
                 stash includes: 'target/bccd.noarch.deb', name: 'bccd.noarch.deb'
+            }
+            post {
+                cleanup {
+                    sh 'vagrant halt'
+                }
             }
         }
         stage('target/debootstrap-bccd.tar.bz2') {
@@ -28,7 +33,7 @@ pipeline {
             }
             post {
                 cleanup {
-                    sh 'vagrant destroy'
+                    sh 'vagrant halt'
                 }
             }
         }
