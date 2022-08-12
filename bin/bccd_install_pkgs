@@ -6,8 +6,6 @@ set -eo pipefail
 # Get PACKAGES array
 . "${WORKSPACE}"/packages.conf
 
-trap 'debootstrap_cleanup' INT TERM EXIT ERR
-
 setup_virtual_mounts
 
 # gnupg2 is required for apt-key
