@@ -38,7 +38,7 @@ target/bccd.noarch.deb: build/src/etc/bccd-revision
 debootstrap: 
 	# Script will either create a new debootstrap (if executing a debootstrap project) or extract the imported
 	# debootstrap.tar.bz2 artifact
-	"$(WORKSPACE)"/bin/prepare_debootstrap
+	"$(WORKSPACE)"/vagrant/bin/prepare_debootstrap
 
 target/debootstrap-bccd.tar.bz2: target/bccd.noarch.deb debootstrap
 	/bin/cp -v "$<" "$(WORKSPACE)/debootstrap/tmp"
