@@ -4,20 +4,15 @@ set -xeo pipefail
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
-if [[ -z ${WORKSPACE} ]]; then
-    echo "Must be run w/i Jenkins!" >&2
-    exit 1
-fi
-
-. "${WORKSPACE}"/bccd.conf
+. /vagrant/bccd.conf
 
 trap 'debootstrap_cleanup' INT TERM EXIT ERR
 
-DBS_TAR="${WORKSPACE}/target/debootstrap.tar.bz2"
+DBS_TAR="/vagrant/target/debootstrap.tar.bz2"
 
 # Support either debootstrap-bccd or debootstrap
 if [[ -z ${NO_BCCD} ]]; then
-    DBS_BCCD_TAR="${WORKSPACE}/target/debootstrap-bccd.tar.bz2"
+    DBS_BCCD_TAR="/vagrant/target/debootstrap-bccd.tar.bz2"
 else
     DBS_BCCD_TAR="${DBS_TAR}"
 fi
@@ -36,9 +31,9 @@ if [[ "${STAGE_NAME}" = "target/debootstrap.tar.bz2" ]]; then
         "${DBS_DIR}" \
         http://debmirror.cluster.earlham.edu
 elif [[ -r "${DBS_BCCD_TAR}" ]]; then
-    nice pbzip2 -dc "${DBS_BCCD_TAR}" | tar -C "${WORKSPACE}" -xf -
+    nice pbzip2 -dc "${DBS_BCCD_TAR}" | tar -C /vagrant -xf -
 elif [[ -r "${DBS_TAR}" ]]; then
-    nice pbzip2 -dc "${DBS_TAR}" | tar -C "${WORKSPACE}" -xf -
+    nice pbzip2 -dc "${DBS_TAR}" | tar -C /vagrant -xf -
 else
     echo "No valid action available!" >&2
     exit 1
