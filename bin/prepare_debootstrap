@@ -19,7 +19,11 @@ if [[ ! -d "${DBS_DIR}" ]]; then
     mkdir -p "${DBS_DIR}"
 fi
 
-if [[ "${STAGE_NAME}" = "target/debootstrap.tar.bz2" ]]; then
+if [[ -r "${DBS_BCCD_TAR}" ]]; then
+    nice pbzip2 -dc "${DBS_BCCD_TAR}" | tar -C /vagrant -xf -
+elif [[ -r "${DBS_TAR}" ]]; then
+    nice pbzip2 -dc "${DBS_TAR}" | tar -C /vagrant -xf -
+else; then 
     # Temporarily disable GPG checking until release file signing is sorted out
     sudo debootstrap \
         --no-check-gpg \
@@ -28,13 +32,6 @@ if [[ "${STAGE_NAME}" = "target/debootstrap.tar.bz2" ]]; then
         "${DEBIAN_RELEASE}" \
         "${DBS_DIR}" \
         http://debmirror.cluster.earlham.edu
-elif [[ -r "${DBS_BCCD_TAR}" ]]; then
-    nice pbzip2 -dc "${DBS_BCCD_TAR}" | tar -C /vagrant -xf -
-elif [[ -r "${DBS_TAR}" ]]; then
-    nice pbzip2 -dc "${DBS_TAR}" | tar -C /vagrant -xf -
-else
-    echo "No valid action available!" >&2
-    exit 1
 fi
 
 for dir in dev proc sys boot/grub; do
