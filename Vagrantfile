@@ -59,6 +59,8 @@ Vagrant.configure("2") do |config|
     lv.memory = "2048"
     lv.storage_pool_name = "vagrant"
   end
+# The public key needs to go in the box at /home/vagrant/.ssh/authorized_keys
+  config.ssh.private_key_path = "/var/lib/jenkins/.ssh/id_rsa"
 
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
